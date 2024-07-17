@@ -1,69 +1,73 @@
 using FFTW
-using ProgressBars
 using StatsBase: mean
-PB_STEPS = 1000
-
+using LinearAlgebra
+c = 3e8
 mutable struct Material
 	L::Real
 	α::Real
 	β::Vector{Real}
 	γ::Real
 	λ::Real
+	fr::Real
+	τl::Real
+	τvib::Real
 end
 
-smf28(L::Real, λ::Real) = Material(L, 0.046e-3, [0.0, -2.1682619391414893e-26], 1.1e-3, λ)
+smf28(L::Real, λ::Real) = Material(L, 0.046e-3, [0.0, -2.1682619391414893e-26], 1.1e-3, λ, 0.18, 32e-15, 12.2e-15)
 
 struct NLSEProblem
 	t::Vector{Real}
-	u0::Vector{Complex}
+	u0::Vector{ComplexF64}
 	material::Material
 	##
 end
 
-function solve(prob::NLSEProblem, dz::Real; dzg = 256, tol::Real = 1e-6, fullsol::Bool = true, showprogress::Bool = false, Ladim::Real = 0.0)
+function hr(material, t)
+	@. 0.0 + (t > 0) * (1.0 / material.τvib^2 + 1.0 / material.τl^2) * material.τvib * exp(-t / material.τl) * sin(t / material.τvib)
+end
+
+function solve(prob::NLSEProblem, dz::Real; n_saves = nothing, tol::Real = 1e-3)
 
 	N = length(prob.t)
 	T = prob.t[end] - prob.t[1]
 
-	ν = fftshift(collect(-N/2:N/2-1))
-	t = prob.t / T
+	ν = fftshift(collect(-N/2:N/2-1)) / T
+	global ν0 = c / prob.material.λ
 
-	if Ladim == 0.0
-		Ladim = prob.material.L
-	end
-
-	L = prob.material.L / Ladim
-	Pmax = maximum(abs2.(prob.u0))
-	dz = dz / Ladim
-	α = prob.material.α * Ladim
-	γ = prob.material.γ * Ladim * Pmax
+	L = prob.material.L
+	α = prob.material.α
+	γ = prob.material.γ
 
 	function f_NLSE(u, U)
-		1im * γ * fft(u .* abs2.(u))
+		IT = u .* abs2.(u)
+		1im * γ * fft(IT .+ 1im * ifft(1im * 2pi * ν .* fft(IT)) ./ (2pi * ν0))
 	end
 
-	z = [0.0]
-
-	u0 = prob.u0 ./ sqrt(Pmax)
 	d = -0.5α * ones(N)
 
-	if showprogress
-		progress = ProgressBar(total = PB_STEPS, printing_delay = 0.01)
-	end
-
 	for i in eachindex(prob.material.β)
-		d = d .+ 1im * prob.material.β[i] * (2π * ν) .^ (i) / factorial(i) / T^i * Ladim
+		d = d .+ 1im * prob.material.β[i] * (2π * ν) .^ (i) / factorial(i)
 	end
 
-	u = u0
+	u = ComplexF64.(prob.u0)
 	U = fft(u)
 	NU = f_NLSE(u, U)
-	M = u0
-	zk = 0
-	c = 0
-	zg = dzg / Ladim
-	while zg < L
-		while zk < zg
+	zk = 0.0
+
+
+	if !isnothing(n_saves)
+		z_saves = LinRange(0, L, n_saves)
+		us = zeros(ComplexF64, n_saves, N)
+	else
+		z_saves = [L]
+		us = zeros(ComplexF64, 1, N)
+	end
+
+
+
+	for (i, zi) in enumerate(z_saves)
+		while zk < zi
+
 			e = exp.(0.5 * dz * d)
 			Uip = e .* U
 
@@ -88,47 +92,35 @@ function solve(prob::NLSEProblem, dz::Real; dzg = 256, tol::Real = 1e-6, fullsol
 
 			U2 = r .+ dz * (k4 / 15.0 .+ k5 / 10.0)
 
-			err = sqrt(sum(abs2.(U1 .- U2)) ./ sum(abs2.(U1))) #MSE
+			err = _compute_error(U1, U2)
 
 			dzopt = max(0.5, min(2.0, 0.9 * sqrt(sqrt(tol / err)))) * dz
 
 			if err <= tol
 
-				if showprogress
-					update(progress, round(Int, PB_STEPS * dz))
-				end
-
-
-				dz = min(dzopt, abs(zk - zg))
+				dz = min(dzopt, abs(zk - zi))
 				zk = zk + dz
 
 				U = U1
 				u = u1
 				NU = k5
-				c = c + 1
-				if (c >= 10000)
-					print("err = ", err, "dzopt = ", dzopt)
-					return
-				end
+
 			else
 				dz = dzopt
 			end
 		end
 
-		if fullsol
-			z = vcat(z, zg)
-			append!(M, u)
-		end
-		zg = zg + dzg / Ladim
+
+		us[i, :] = u
+
 	end
-	if fullsol == true
-		return z * Ladim, reshape(M, N, length(M) ÷ N) .* sqrt(Pmax)
-	else
-		return z[1] * Ladim, u .* sqrt(Pmax)
-	end
+
+
+	return z_saves, us
 
 end
 
+_compute_error(a, b) = norm(a - b) / norm(a)
 
 function dBm2W(PdBm)
 	10^(0.1 * PdBm - 3)
