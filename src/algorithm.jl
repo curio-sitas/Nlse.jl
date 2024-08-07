@@ -1,7 +1,28 @@
 
 # D dispersion op
 # N nonlinear term
-function _erk4ip_step!(û, dz, k₅ = nothing) 
+using FFTW
+
+function integrate(u₀, L)
+
+    dz = L / 1000
+    z = 0
+    l = []
+    k₅ = nothing
+
+    D = 1.0 + zeros(length(u₀))
+
+    N(û) = fft(ifft())
+
+    while z < L 
+        û, err = _erk4ip_step!(û)
+        z = z + dz
+
+        append!(l, z)
+    end 
+
+
+function _erk4ip_step!(û, k₅ = nothing) 
 
 
     a_int = dispersion_op*û
@@ -26,3 +47,5 @@ end
 function _compute_error(a,b)
     sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
 end
+
+function integrate
