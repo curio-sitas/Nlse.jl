@@ -3,6 +3,10 @@ uuid = "21c1a3e3-8543-4069-a1c4-5ed3e2bf6e2f"
 authors = ["brian-sinquin <brian.sinquin@gmail.com>"]
 version = "2.0.0"
 
+[deps]
+DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+
 [compat]
 julia = "1.6.7"
 
