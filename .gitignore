@@ -1,6 +1,6 @@
-*.jl.cov
 *.jl.*.cov
+*.jl.cov
 *.jl.mem
-Manisfest.toml
-deps/deps.jl
-experiments
+/Manifest.toml
+/docs/Manifest.toml
+/docs/build/

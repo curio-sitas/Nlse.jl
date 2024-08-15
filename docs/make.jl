@@ -1,36 +1,23 @@
-using Documenter, Literate
 using FiberNlse
+using Documenter
 
-EXAMPLES = joinpath("../", @__DIR__, "examples")
-MD_OUTPUT = joinpath(@__DIR__, "src", "examples")
-ispath(MD_OUTPUT) && rm(MD_OUTPUT; recursive = true)
+DocMeta.setdocmeta!(FiberNlse, :DocTestSetup, :(using FiberNlse); recursive=true)
 
-
-for file in readdir(EXAMPLES; join = true)
-	endswith(file, ".jl") || continue
-	Literate.markdown(file, MD_OUTPUT; documenter = true)
-end
-
-makedocs(
-	sitename = "FiberNlse",
-	format = Documenter.HTML(),
-	modules = [FiberNlse],
-	authors = "Brian Sinquin",
-	pages = [
-		"Home" => "index.md",
-		"Theoretical Background" => "theory.md",
-		"User Guide" => "userguide.md",
-		"Examples" =>
-			joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(MD_OUTPUT))),
-		"API" => "api.md",
-	],
+makedocs(;
+    modules=[FiberNlse],
+    authors="curio-sitas <brian.sinquin@gmail.com> and contributors",
+    sitename="FiberNlse.jl",
+    format=Documenter.HTML(;
+        canonical="https://brian-sinquin.github.io/FiberNlse.jl",
+        edit_link="main",
+        assets=String[],
+    ),
+    pages=[
+        "Home" => "index.md",
+    ],
 )
 
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
 deploydocs(;
-	repo = "github.com/brian-sinquin/FiberNlse.jl.git",
-	target = "build",
-	push_preview = true,
+    repo="github.com/brian-sinquin/FiberNlse.jl",
+    devbranch="main",
 )

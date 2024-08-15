@@ -1,3 +1,14 @@
-# FiberNlse.jl
+```@meta
+CurrentModule = FiberNlse
+```
 
-Documentation for FiberNlse.jl
+# FiberNlse
+
+Documentation for [FiberNlse](https://github.com/brian-sinquin/FiberNlse.jl).
+
+```@index
+```
+
+```@autodocs
+Modules = [FiberNlse]
+```
