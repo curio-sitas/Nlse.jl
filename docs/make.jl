@@ -1,23 +1,23 @@
 using FiberNlse
 using Documenter
 
-DocMeta.setdocmeta!(FiberNlse, :DocTestSetup, :(using FiberNlse); recursive=true)
+DocMeta.setdocmeta!(FiberNlse, :DocTestSetup, :(using FiberNlse); recursive = true)
 
 makedocs(;
-    modules=[FiberNlse],
-    authors="curio-sitas <brian.sinquin@gmail.com> and contributors",
-    sitename="FiberNlse.jl",
-    format=Documenter.HTML(;
-        canonical="https://brian-sinquin.github.io/FiberNlse.jl",
-        edit_link="main",
-        assets=String[],
-    ),
-    pages=[
-        "Home" => "index.md",
-    ],
+	modules = [FiberNlse],
+	authors = "curio-sitas <brian.sinquin@gmail.com> and contributors",
+	sitename = "FiberNlse.jl",
+	format = Documenter.HTML(;
+		canonical = "https://brian-sinquin.github.io/FiberNlse.jl",
+		edit_link = "main",
+		assets = String[],
+	),
+	pages = [
+		"Home" => "index.md",
+	],
 )
 
 deploydocs(;
-    repo="github.com/brian-sinquin/FiberNlse.jl",
-    devbranch="main",
+	repo = "github.com/brian-sinquin/FiberNlse.jl",
+	push_preview = true,
 )
