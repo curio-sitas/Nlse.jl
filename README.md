@@ -11,13 +11,13 @@ Documentation : [![](https://img.shields.io/badge/docs-stable-blue.svg)](https:/
 
 ---
 
- A non-linear Schrödinger equation solver for julia aimed towards fiber optics. 
-**(🚧 Under development)**
+ A Generalised Non-Linear Schrödinger Equation (GNLSE) solver for julia aimed towards fiber optics or other waveguides. 
+
 ## Features
 
-The *FiberNlse.jl* package simulates the propagation of an optical field envelope signal of duration **T** in an optical fiber of length *L*. The chromatic dispersion (**D**) and SPM (self-phase modulation) (**γ**) wich arises from **Kerr** non-linearity are taken as parameters.
+The *FiberNlse.jl* package simulates the propagation of an optical field envelope signal in a waveguide showing *Kerr* nonlinearity, group velocity dispersion, Raman scattering and linear losses.
 
-The core of the simulation consists in the integration of the *Non-Linear Schrödinger Equation* with the desired signal as initial condition. The package uses the Fourier Split-Step Method algorithm. 
+The algorithm used is ERK4(5)-IP with adaptative step-size. The **API** permits to include the Raman scattering or/and self-steepening in the integration process.
 
 ---
 
@@ -28,28 +28,35 @@ To install you can simply type :
 ```
 in your julia terminal or clone this repository and include the `src/FiberNlse.jl` file in your project.
 
-## Roadmap
+## ⚙️ Current development state
 
-- [x] Implement Split-Step Method
+- [x] Implement ERK4(5)-IP integration
 - [x] Register DOI
-- [x] Document code
+- [ ] Document code
+- [ ] New Logo / Visuals
+- [ ] Benchmark / Comparison with other language packages (Python/Matlab/C)
+- [ ] Documentation + sources
+- [ ] Examples (NL Compression, MI, Super-Continuum, Flaticons, Similaritons, Solitons, Dispersion spreading)
 - [x] Setup continuous integration
-- [x] Add progress bar option
-- [x] Add non constant dispersion (and higher order dispersion)
+- [ ] Add progress bar option
+- [x] higher order dispersion
+- [ ] Add variable dispersion, loss and nonlinearity
 - [x] Add Self-steepening
+- [x] Add Raman scattering
+- [ ] Utils and helper functions for visualization and field manipulation
+- [ ] Phase sign convention
 
      
-- ### Future version (2.0) -- (compatibility breaking)
-- [ ] Higher order integral solver (**DifferentialEquations.jl**)
-- [ ] Add wavelength dependence to dispersion
-- [ ] More complex material model API (GNLSE, Raman, SS, ...)
+## 💡 Future ideas
 - [ ] Many solvers (as in [pychi](https://github.com/pychi-code/pychi/tree/main))
-- [ ] Solver API (as **DifferentialEquations.jl**)
-- [ ] Better Data manipulation (maybe a standalone package?)
-- [ ] Make it compatible with **AD** for optimisation
-      
+- [ ] Make it compatible with **AD** for optimisation or inverse problems      
 
-## Citation
+## 🤝 Contributions
+
+Any help to optimize, refactor or enrich the package is welcome, whatever it is on the core side or practical examples.
+Don't hesitate to open an issue if something goes wrong with the package.
+
+## 📝 Citation
 
 Please cite this repository if you use it to publish data in a research paper.
 
@@ -65,4 +72,3 @@ Please cite this repository if you use it to publish data in a research paper.
   url          = {https://doi.org/10.5281/zenodo.8251777}
 }
 ```
-

@@ -1,32 +1,36 @@
 @testset "Self-Phase Modulation" begin
 
-    #TODO : rewrite clean test
+	#TODO : rewrite clean test
 
-    # Simulation dimension
-    Nz = 5000
+	# Simulation dimension
+	Nₜ = 2^13
 
-    # Fiber properties
+	# Fiber properties
+	L = 5.0e3 # Fiber length
 
-    D = 0 * 0.9e-6
-    α = 0 * 0.026e-3
-    γ = 10.1e-3
-    L = 100.0
+	# Signal properties
+	τ = 40e-12 # Pulse duration
+	T = 4000e-12 # Signal duration
+	λ = 1550e-9 # Wavelength
+	N = 1 # Soliton number
 
-    # Signal properties
-    λ = 1550e-9 # Wavelength
-    Pp = 0.550
-    f₀ = 10.0e9
-    fs = 100*f₀
-    T = 2 / f₀ # Signal duration
-    Nt = fs*T
-    t = T * (0:(Nt-1)) / Nt # Time vector
-    ψ₀ = @. 0 * 1im .+ sqrt(Pp) * cos(2pi * f₀ * t)
+	α = 0.0
 
-    fib = Fiber(L, dispersion(D, λ), γ, α, λ)
-    field = propagate(ψ₀, fib, T, Nz)
+	fib = Waveguide(α, [0.0, -2.6e-26], 1.1e-3, λ, L)
 
-    φ = unwrap(phase(field.ψ[end, :]), range=pi)
-    φₜₕ = - γ * abs2.(ψ₀) * L
-    
-    @test (sum(abs.(φₜₕ .- φ) ./ φₜₕ ) / length(φₜₕ)) < 0.001
+	t = (-Nₜ÷2:Nₜ÷2-1) * T / Nₜ
+
+
+	# Input construction
+	P₀ = abs((fib.βs[2] / fib.γ / τ^2) * N^2) # Soliton power
+	Ψₒ = sqrt(P₀) * sech.(t ./ τ) .+ 0.0im# Soliton formula
+
+	model = create_model(Ψₒ, t, fib)
+
+	sol = simulate(Ψₒ, t, model, nsaves = 200)
+
+	φ = unwrap(angle.(sol.At[end, :]), range = pi)
+	φₜₕ = -fib.γ * abs2.(Ψₒ) * L
+
+	@test (sum(abs.(φₜₕ .- φ) ./ φₜₕ) / length(φₜₕ)) < 0.001
 end
