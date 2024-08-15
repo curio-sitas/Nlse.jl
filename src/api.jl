@@ -53,9 +53,11 @@ function create_model(u, t, wg::Waveguide; self_steepening::Bool = false, raman:
 
 	ω0 = 2pi * c / wg.λc
 
-
+	# default values if no raman 
 	raman_freq_response = nothing
 	fr = 0
+
+	# raman model data
 	if raman && wg.raman_model != :none
 		raman_freq_response = conj((fftp * ifftshift(wg.raman_model.time_response(t))))
 		fr = wg.raman_model.fr

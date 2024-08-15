@@ -8,10 +8,7 @@ mutable struct Waveguide
 	L::Any
 	raman_model::Any
 end
-
-
 Waveguide(α, βs, γ, λc, L; raman_model = :none) = Waveguide(α, βs, γ, λc, L, raman_model)
-
 
 
 mutable struct Model
