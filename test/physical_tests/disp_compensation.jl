@@ -2,8 +2,8 @@
 
 	# Simulation dimensionality
 
-	N = 2^13 # Number of timesteps
-	t = (-N÷2:N÷2-1) * T / N # time cector
+	N = 2^14 # Number of timesteps
+
 
 	# Fiber properties
 
@@ -22,8 +22,9 @@
 
 
 	# Input construction
+	t = (-N÷2:N÷2-1) * T / N # time cector
 	P₀ = 1e-3
-	Ψₒ = @. sqrt(P₀) / cosh(t / τ) .+ 0.0im # Input field
+	Ψₒ = @. sqrt(P₀) * sech(t / τ) .+ 0.0im # Input field
 
 	# Creating simulation models
 	model1 = create_model(Ψₒ, t, fib1)
