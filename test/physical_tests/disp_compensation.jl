@@ -33,3 +33,7 @@
 	# Testing signal propagation (including losses)
 	@test isapprox(Ψₒ, sol2.At[end, :])
 end
+
+@testset "Dispersion compensation" begin
+	@test FiberNlse.combine(sol1, sol2) == FiberNlse.combine([sol1, sol2])
+end
