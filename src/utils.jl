@@ -7,7 +7,7 @@ function combine(sol1::Solution, sol2::Solution)
 	At = vcat(sol1.At, sol2.At)
 	Af = vcat(sol1.Af, sol2.Af)
 	z = vcat(sol1.z, sol2.z .+ sol1.z[end])
-	return Solution(z, t, f, At, Af)
+	Solution(z, t, f, At, Af)
 
 end
 
@@ -18,4 +18,3 @@ function combine(sols::Vector{Solution})
 	end
 	sol
 end
-
