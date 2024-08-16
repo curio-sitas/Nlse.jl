@@ -1,8 +1,12 @@
 @testset "Dispersion Compensation" begin
-	# Simulation dimension
-	N = 2^13
+
+	# Simulation dimensionality
+
+	N = 2^13 # Number of timesteps
+	t = (-N÷2:N÷2-1) * T / N # time cector
 
 	# Fiber properties
+
 	L = 2.0e3 # Fiber length
 
 	# Signal properties
@@ -10,26 +14,27 @@
 	λ = 1550e-9 # Wavelength
 	τ = 3e-12 # Pulse duration
 
+	# Waveguides
 	fib1 = Waveguide(0.0, [0.0, -2.6e-26], 0.0, λ, L)
 	fib2 = Waveguide(0.0, [0.0, 2.6e-26], 0.0, λ, L)
 
-	t = (-N÷2:N÷2-1) * T / N
 
 
 
 	# Input construction
 	P₀ = 1e-3
-	Ψₒ = @. sqrt(P₀) / cosh(t / τ) .+ 0.0im # Soliton formula
+	Ψₒ = @. sqrt(P₀) / cosh(t / τ) .+ 0.0im # Input field
 
-
+	# Creating simulation models
 	model1 = create_model(Ψₒ, t, fib1)
 	model2 = create_model(Ψₒ, t, fib2)
 
 
-	# run the simulation
+	# Simulation
 	sol1 = simulate(Ψₒ, t, model1)
 	sol2 = simulate(sol1.At[end, :], t, model2)
 
-	# Testing signal propagation (including losses)
+	# Testing if input equals output
 	@test isapprox(Ψₒ, sol2.At[end, :])
+
 end
