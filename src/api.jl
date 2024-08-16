@@ -23,7 +23,7 @@ function NL_spm_raman(u, model)
 	return 1.0im .* model.γ .* M
 end
 
-function setup_nonlinearity_term(self_steepening::Bool = true, raman::Bool = true)
+function choose_nonlinear_term(self_steepening::Bool = true, raman::Bool = true)
 
 	if self_steepening && raman
 		return NL_spm_self_steepening_raman
@@ -55,17 +55,14 @@ function create_model(u, t, wg::Waveguide; self_steepening::Bool = false, raman:
 
 	# default values if no raman 
 	raman_freq_response = nothing
-	fr = 0
-
 	# raman model data
-	if raman && wg.raman_model != :none
+	if raman && wg.raman_model.fr != 0.0
 		raman_freq_response = conj((fftp * ifftshift(wg.raman_model.time_response(t))))
-		fr = wg.raman_model.fr
 	end
 
 	dispersion_term = -0.5wg.α .+ 1im * sum([(wg.βs[i] / factorial(i)) .* ω .^ i for i in eachindex(wg.βs)])
-	nonlinear_function = setup_nonlinearity_term(self_steepening, raman)
-	Model(t, ω, dt, N, fftp, ifftp, dispersion_term, nonlinear_function, fr, wg.γ, raman_freq_response, ω0, wg.L)
+	nonlinear_function = choose_nonlinear_term(self_steepening, raman)
+	Model(t, ω, dt, N, fftp, ifftp, dispersion_term, nonlinear_function, wg.raman_model.fr, wg.γ, raman_freq_response, ω0, wg.L)
 end
 
 
@@ -80,8 +77,6 @@ function raman_linagrawaal(fr = 0.18, τl = 32e-15,
 	return RamanModel(fr, time_response)
 
 end
-
-
 
 function _compute_error(a, b)
 	sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
@@ -132,9 +127,6 @@ function _integrate_to_z(stepper, z, model, maxiters, reltol)
 	end
 end
 
-
-
-
 function simulate(u, t, model; nsaves = 20, dz = 1.0, reltol = 1e-6, maxiters = 1000)
 
 	T = t[end] - t[1]
@@ -143,7 +135,7 @@ function simulate(u, t, model; nsaves = 20, dz = 1.0, reltol = 1e-6, maxiters = 
 
 
 	# initial stepper
-	stepper = Stepper(model.fftp * u, model.nonlinear_function(u, model), dz, 0.0, 0.0, 0.0)
+	stepper = Stepper(model.fftp * u, model.nonlinear_function(u, model), dz, 0.0, 0.0, nothing)
 	zsaves = (0:nsaves) * model.L / nsaves
 	dz = min(model.L / (2 * nsaves), dz)
 	M = zeros(ComplexF64, (nsaves + 1, N))

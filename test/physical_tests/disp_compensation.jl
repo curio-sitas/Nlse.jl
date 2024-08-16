@@ -1,6 +1,6 @@
 @testset "Dispersion compensation" begin
 	# Simulation dimension
-	Nₜ, Nₗ = (2000, 200)
+	N = 2^13
 
 	# Fiber properties
 	L = 2.0e3 # Fiber length
@@ -13,13 +13,13 @@
 	fib1 = Waveguide(0.0, [0.0, -2.6e-26], 0.0, λ, L)
 	fib2 = Waveguide(0.0, [0.0, 2.6e-26], 0.0, λ, L)
 
-	t = (0:(Nₜ-1)) * T / Nₜ .- 0.5T
+	t = (-N÷2:N÷2-1) * T / N
 
 
 
 	# Input construction
 	P₀ = 1e-3
-	Ψₒ = @. sqrt(P₀) / cosh(t / τ) # Soliton formula
+	Ψₒ = @. sqrt(P₀) / cosh(t / τ) .+ 0.0im # Soliton formula
 
 
 	model1 = create_model(Ψₒ, t, fib1)
