@@ -127,7 +127,7 @@ function _integrate_to_z(stepper, z, model, maxiters, reltol)
 	end
 end
 
-function simulate(u, t, model; nsaves = 20, dz = 1.0, reltol = 1e-6, maxiters = 1000)
+function simulate(u, t, model::Model; nsaves = 20, dz = 1.0, reltol = 1e-6, maxiters = 1000)
 
 	T = t[end] - t[1]
 	N = length(t)
@@ -151,4 +151,22 @@ function simulate(u, t, model; nsaves = 20, dz = 1.0, reltol = 1e-6, maxiters = 
 	end
 
 	return Solution(zsaves, t, ν, ifft(M, 2), M)
+end
+
+function simulate(u, t, wg::Waveguide; args...)
+	model = create_model(u, t, wg)
+	simulate(u, t, model; args...)
+end
+
+function simulate(u, t, models::Vector{Model}; args...)
+	sols = [simulate(u, t, models[1]; args...)]
+	for model ∈ models[2:end]
+		push!(sols, simulate(sols[end].At[end, :], t, model; args...))
+	end
+	combine(sols)
+end
+
+function simulate(u, t, wgs::Vector{Waveguide}; args...)
+	models = [create_model(u, t, wg) for wg in wgs]
+	simulate(u, t, models; args...)
 end

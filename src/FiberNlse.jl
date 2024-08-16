@@ -2,7 +2,7 @@ module FiberNlse
 
 using FFTW
 
-export simulate, Waveguide, raman_linagrawaal, create_model, Solution
+export simulate, Waveguide, raman_linagrawaal, create_model, Solution, Model
 
 export combine
 

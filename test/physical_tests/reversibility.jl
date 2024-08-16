@@ -1,4 +1,4 @@
-@testset "NLSE reversibility" begin
+@testset "NLSE Reversibility" begin
 	# Simulation dimension
 	N = 2^13
 

@@ -7,31 +7,31 @@ end
 
 NoRaman = RamanModel(0.0, () -> ())
 
-mutable struct Waveguide{T <: Real}
-	α::Union{T, Array{T}}
-	βs::Array{T}
-	γ::Union{T, Array{T}}
-	λc::T
-	L::T
+mutable struct Waveguide
+	α::Union{Float64, Array{Float64}}
+	βs::Array{Float64}
+	γ::Union{Float64, Array{Float64}}
+	λc::Float64
+	L::Float64
 	raman_model::RamanModel
 end
 Waveguide(α, βs, γ, λc, L; raman_model = NoRaman) = Waveguide(α, βs, γ, λc, L, raman_model)
 
 
-mutable struct Model{T <: Real}
-	t::AbstractArray{T}
-	ω::AbstractArray{T}
-	dt::T
+mutable struct Model
+	t::AbstractArray{Float64}
+	ω::AbstractArray{Float64}
+	dt::Float64
 	N::Int
 	fftp::Any
 	ifftp::Any
 	dispersion_term::AbstractArray{ComplexF64}
 	nonlinear_function::Function
-	fr::T
-	γ::T
+	fr::Float64
+	γ::Float64
 	raman_freq_response::Union{Nothing, AbstractArray{ComplexF64}}
-	ω0::T
-	L::T
+	ω0::Float64
+	L::Float64
 end
 
 mutable struct Solution

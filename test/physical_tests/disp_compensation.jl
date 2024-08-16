@@ -1,4 +1,4 @@
-@testset "Dispersion compensation" begin
+@testset "Dispersion Compensation" begin
 	# Simulation dimension
 	N = 2^13
 

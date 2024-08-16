@@ -1,4 +1,4 @@
-@testset "Soliton invariance" begin
+@testset "Soliton Invariance" begin
 
 	# Simulation dimension
 	N = 2^13
