@@ -40,6 +40,12 @@
 	solc = FiberNlse.combine(sola, solb)
 
 
-	@test solc == sols
+	@test begin
+		solc.t == sols.t &&
+			solc.z == sols.z &&
+			solc.f == sols.f &&
+			solc.At == sols.At &&
+			solc.Af == sols.Af
+	end
 
 end
