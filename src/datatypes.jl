@@ -49,6 +49,7 @@ mutable struct Stepper
 	z::Float64
 	local_error::Float64
 	k5::Union{Nothing, AbstractArray{ComplexF64}}
+	it::Int
 end
 
 

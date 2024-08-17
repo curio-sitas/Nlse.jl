@@ -1,27 +1,4 @@
 
-function NL_spm(u, model)
-	return 1.0im .* model.γ * model.fftp * (u .* abs2.(u))
-end
-
-function NL_spm_self_steepening(u, model)
-	η = (1 .+ model.ω / model.ω0)
-	return 1.0im .* model.γ * η .* (model.fftp * (u .* abs2.(u)))
-end
-
-function NL_spm_self_steepening_raman(u, model)
-	η = (1 .+ model.ω / model.ω0)
-	IT = abs2.(u)
-	RS = model.dt * model.fr * (model.ifftp * ((model.fftp * IT) .* model.raman_freq_response))
-	M = model.fftp * (u .* ((1.0 - model.fr) .* IT .+ RS))
-	return 1.0im .* model.γ * η .* M
-end
-
-function NL_spm_raman(u, model)
-	IT = abs2.(u)
-	RS = model.dt * model.fr * (model.ifftp * ((model.fftp * IT) .* model.raman_freq_response))
-	M = model.fftp * (u .* ((1.0 - model.fr) .* IT .+ RS))
-	return 1.0im .* model.γ .* M
-end
 
 function choose_nonlinear_term(self_steepening::Bool = true, raman::Bool = true)
 
@@ -39,10 +16,10 @@ end
 
 
 
-function create_model(u, t, wg::Waveguide; self_steepening::Bool = false, raman::Bool = false, normalize = true)
+function create_model(u::AbstractArray{ComplexF64}, t, wg::Waveguide; self_steepening::Bool = false, raman::Bool = false, normalize = true)
 
-	fftp = plan_fft(ComplexF64.(u))
-	ifftp = plan_ifft(ComplexF64.(u))
+	fftp = plan_fft(u)
+	ifftp = plan_ifft(u)
 
 	T = t[end] - t[1]
 	N = length(u)
@@ -66,64 +43,18 @@ function create_model(u, t, wg::Waveguide; self_steepening::Bool = false, raman:
 end
 
 
-function raman_linagrawaal(fr = 0.18, τl = 32e-15,
-	τvib = 12.2e-15)
 
-	function time_response(t)
-		hr = 0.0 .+ (t .>= 0) .* ((τvib^2 + τl^2) / τvib / τl^2 * exp.(-t / τl) .* sin.(t / τvib))
-		return hr
-	end
-
-	return RamanModel(fr, time_response)
-
-end
 
 function _compute_error(a, b)
 	sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
 end
 
 function _integrate_to_z(stepper, z, model, maxiters, reltol)
-	it = 0
+	stepper.it = 0
 	while stepper.z < z
 
-		e = exp.(0.5 * stepper.dz * model.dispersion_term)
+		_erk4ip_step!(stepper, model, z, reltol, maxiters)
 
-		Uip = e .* stepper.U
-
-		k1 = e .* stepper.NU
-
-		k2 = model.nonlinear_function(model.ifftp * (Uip .+ 0.5 * stepper.dz * k1), model)
-
-		k3 = model.nonlinear_function(model.ifftp * (Uip .+ 0.5 * stepper.dz * k2), model)
-
-		k4 = model.nonlinear_function(model.ifftp * (e .* (Uip .+ stepper.dz * k3)), model)
-
-		r = e .* (Uip .+ stepper.dz * (k1 / 6.0 .+ k2 / 3.0 .+ k3 / 3.0))
-
-		U1 = r .+ stepper.dz * k4 / 6.0
-
-		stepper.k5 = model.nonlinear_function(model.ifftp * U1, model)
-
-		U2 = r .+ stepper.dz * (k4 / 15.0 .+ stepper.k5 / 10.0)
-
-		stepper.local_error = _compute_error(U1, U2)
-
-		dzopt =
-			max(0.5, min(2.0, 0.9 * sqrt(sqrt(reltol / stepper.local_error)))) * stepper.dz
-
-		if stepper.local_error <= reltol
-
-			stepper.dz = min(dzopt, abs(z - stepper.z))
-			stepper.z = stepper.z + stepper.dz
-			stepper.U = U1
-			stepper.NU = stepper.k5
-		else
-			stepper.dz = dzopt
-			it = it + 1
-			if (it >= maxiters)
-				throw(ErrorException("Max number of iteration exceeded!"))
-			end
-		end
 	end
 end
 
@@ -135,7 +66,7 @@ function simulate(u, t, model::Model; nsaves = 20, dz = 1.0, reltol = 1e-6, maxi
 
 
 	# initial stepper
-	stepper = Stepper(model.fftp * u, model.nonlinear_function(u, model), dz, 0.0, 0.0, nothing)
+	stepper = Stepper(model.fftp * u, model.nonlinear_function(u, model), dz, 0.0, 0.0, nothing, 0)
 	zsaves = (0:nsaves) * model.L / nsaves
 	dz = min(model.L / (2 * nsaves), dz)
 	M = zeros(ComplexF64, (nsaves + 1, N))
