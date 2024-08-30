@@ -1,4 +1,5 @@
 using FiberNlse
+using FFTW
 using Plots
 
 
@@ -12,7 +13,7 @@ km = 1e3
 λ = 1.55e-6
 L = 4.0e3
 
-fiber = Waveguide(α, [0.0, β2], γ, λ, L, raman_linagrawaal())
+fiber = Waveguide(α, [0.0, β2], γ, λ, L)
 
 
 # Signal 
@@ -36,9 +37,7 @@ q = 1.6
 U = @. sqrt(P0) * cos(0.5pi * V0 / Vpirf * cos(Ω0 * t) + 0.5pi * Vb / Vpidc) * cis(pi * q * V0 / Vpip * cos(Ω0 * t + Δθ))
 
 
-
-model = create_model(U, t, fiber, raman = true, self_steepening = true)
-sol = simulate(U, t, model, nsaves = 256, dz = 10.0, reltol = 1e-5)
+sol = gnlse(U, t, fiber, nsaves = 10, dz = 10.0, reltol = 1e-5)
 
 
 

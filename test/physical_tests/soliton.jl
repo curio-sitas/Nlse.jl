@@ -23,9 +23,8 @@
 	P₀ = abs((fib.βs[2] / fib.γ / τ^2) * n^2) # Soliton power
 	Ψₒ = sqrt(P₀) * sech.(t ./ τ) .+ 0.0im # Soliton formula
 
-	model = create_model(Ψₒ, t, fib)
 
-	sol = simulate(Ψₒ, t, model, nsaves = 200)
+	sol = gnlse(Ψₒ, t, fib, nsaves = 200)
 
 	# Testing soliton propagation (including losses)
 	@test isapprox(abs2.(Ψₒ .* exp(-0.5 * fib.α * L)), abs2.(sol.At[end, :]), atol = 1e-4)

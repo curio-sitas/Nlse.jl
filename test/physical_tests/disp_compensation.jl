@@ -26,14 +26,10 @@
 	P₀ = 1e-3
 	Ψₒ = @. sqrt(P₀) * sech(t / τ) .+ 0.0im # Input field
 
-	# Creating simulation models
-	model1 = create_model(Ψₒ, t, fib1)
-	model2 = create_model(Ψₒ, t, fib2)
-
 
 	# Simulation
-	sol1 = simulate(Ψₒ, t, model1)
-	sol2 = simulate(sol1.At[end, :], t, model2)
+	sol1 = gnlse(Ψₒ, t, fib1)
+	sol2 = gnlse(sol1.At[end, :], t, fib2)
 
 	# Testing if input equals output
 	@test isapprox(Ψₒ, sol2.At[end, :])

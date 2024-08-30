@@ -1,24 +1,34 @@
 
-function NL_spm(u, model)
-	return 1.0im .* model.γ * model.fftp * (u .* abs2.(u))
+function _spm(u, model)
+	return 1.0im .* model.γ * (model.fftp * (u .* abs2.(u)))
 end
 
-function NL_spm_self_steepening(u, model)
-	η = (1 .+ model.ω / model.ω0)
-	return 1.0im .* model.γ * η .* (model.fftp * (u .* abs2.(u)))
+function _spm_self_steepening(u, model)
+	return 1.0im .* model.γ * (1 .+ model.ω / model.ω0) .* (model.fftp * (u .* abs2.(u)))
 end
 
-function NL_spm_self_steepening_raman(u, model)
-	η = (1 .+ model.ω / model.ω0)
+function _spm_self_steepening_raman(u, model)
 	IT = abs2.(u)
 	RS = model.dt * model.fr * (model.ifftp * ((model.fftp * IT) .* model.raman_freq_response))
-	M = model.fftp * (u .* ((1.0 - model.fr) .* IT .+ RS))
-	return 1.0im .* model.γ * η .* M
+	return 1.0im .* model.γ * (1 .+ model.ω / model.ω0) .* (model.fftp * (u .* ((1.0 - model.fr) .* IT .+ RS)))
 end
 
-function NL_spm_raman(u, model)
+function _spm_raman(u, model)
 	IT = abs2.(u)
 	RS = model.dt * model.fr * (model.ifftp * ((model.fftp * IT) .* model.raman_freq_response))
-	M = model.fftp * (u .* ((1.0 - model.fr) .* IT .+ RS))
-	return 1.0im .* model.γ .* M
+	return 1.0im .* model.γ .* (model.fftp * (u .* ((1.0 - model.fr) .* IT .+ RS)))
+end
+
+function choose_nonlinear_term(self_steepening::Bool = true, raman::Bool = true)
+
+	if self_steepening && raman
+		return _spm_self_steepening_raman
+	elseif self_steepening && !raman
+		return _spm_self_steepening
+	elseif !self_steepening && raman
+		return _spm_raman
+	else
+		return _spm
+	end
+
 end

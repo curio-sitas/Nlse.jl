@@ -24,19 +24,18 @@ P₀ = 1e-3
 Ψₒ = @. sqrt(P₀) * sech(t / τ) .+ 0.0im # Soliton formula
 
 
-model1 = create_model(Ψₒ, t, fib1)
-model2 = create_model(Ψₒ, t, fib2)
+model1 = GNLSEProblem(t, fib1)
+model2 = GNLSEProblem(t, fib2)
 
 
 # run the simulation
-sol1 = simulate(Ψₒ, t, fib1)
-sol2 = simulate(sol1.At[end, :], t, fib1)
-sol3 = simulate(sol2.At[end, :], t, model2)
-sol4 = simulate(sol3.At[end, :], t, model2)
+sol1 = gnlse(Ψₒ, t, fib1)
+sol2 = gnlse(sol1.At[end, :], t, fib1)
+sol3 = gnlse(sol2.At[end, :], t, model2)
+sol4 = gnlse(sol3.At[end, :], t, model2)
 
 sols = FiberNlse.combine([sol1, sol2, sol3, sol4])
 
+sols2 = gnlse(Ψₒ, t, [fib1, fib2, fib1, fib2])
 
-sols2 = simulate(Ψₒ, t, [fib1, fib2, fib1, fib2])
-
-heatmap(sols.t, sols.z, (abs2.(sols.At)))
+heatmap(sols2.t, sols2.z, (abs2.(sols2.At)))

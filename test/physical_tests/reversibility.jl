@@ -22,13 +22,9 @@
 	Ψₒ = @. sqrt(P₀) * sech(t / τ) .+ 0.0im # Soliton formula
 
 
-	model1 = create_model(Ψₒ, t, fib1)
-	model2 = create_model(Ψₒ, t, fib2)
-
-
 	# run the simulation
-	sol1 = simulate(Ψₒ, t, model1)
-	sol2 = simulate(sol1.At[end, :], t, model2)
+	sol1 = gnlse(Ψₒ, t, fib1)
+	sol2 = gnlse(sol1.At[end, :], t, fib2)
 
 	# Testing signal propagation (including losses)
 	@test FiberNlse._compute_error(sol1.At[1, :] .|> abs2, sol2.At[end, :] .|> abs2) < 1 / 100

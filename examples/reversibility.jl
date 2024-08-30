@@ -1,13 +1,13 @@
 using FiberNlse
 using Plots
 # Simulation dimension
-N = 2^13
+N = 2^15
 
 # Fiber properties
 L = 6.0e3 # Fiber length
 
 # Signal properties
-T = 100e-12 # Signal duration
+T = 500e-12 # Signal duration
 λ = 1550e-9 # Wavelength
 τ = 10e-12 # Pulse duration
 
@@ -19,17 +19,16 @@ t = (-N÷2:N÷2-1) * T / N
 
 
 # Input construction
-P₀ = 0.2
-Ψₒ = @. sqrt(P₀) * cis(-2pi * t / T) * sech(t / τ) .+ 0.0im # Soliton formula
+P₀ = 0.8
+Ψₒ = @. sqrt(P₀) * sech(t / τ) .+ 0.0im # Soliton formula
 
-
-model1 = create_model(Ψₒ, t, fib1)
-model2 = create_model(Ψₒ, t, fib2)
+model1 = GNLSEProblem(t, fib1)
+model2 = GNLSEProblem(t, fib2)
 
 
 # run the simulation
-sol1 = simulate(Ψₒ, t, model1)
-sol2 = simulate(sol1.At[end, :], t, model2)
+sol1 = gnlse(Ψₒ, t, model1)
+sol2 = gnlse((sol1.At[end, :]), t, model2)
 
 sol3 = combine(sol1, sol2)
 

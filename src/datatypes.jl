@@ -14,12 +14,13 @@ mutable struct Waveguide
 	λc::Float64
 	L::Float64
 	raman_model::RamanModel
+	self_steepening::Bool
 end
-Waveguide(α, βs, γ, λc, L; raman_model = NoRaman) = Waveguide(α, βs, γ, λc, L, raman_model)
+Waveguide(α, βs, γ, λc, L; raman_model = NoRaman, self_steepening = false) = Waveguide(α, βs, γ, λc, L, raman_model, self_steepening)
 
 
-mutable struct Model
-	t::AbstractArray{Float64}
+mutable struct GNLSEProblem
+	#t::AbstractArray{Float64}
 	ω::AbstractArray{Float64}
 	dt::Float64
 	N::Int
@@ -48,7 +49,17 @@ mutable struct Stepper
 	dz::Float64
 	z::Float64
 	local_error::Float64
+
+	k1::Union{Nothing, AbstractArray{ComplexF64}}
+	k2::Union{Nothing, AbstractArray{ComplexF64}}
+	k3::Union{Nothing, AbstractArray{ComplexF64}}
+	k4::Union{Nothing, AbstractArray{ComplexF64}}
 	k5::Union{Nothing, AbstractArray{ComplexF64}}
+	Uip::Union{Nothing, AbstractArray{ComplexF64}}
+	U1::Union{Nothing, AbstractArray{ComplexF64}}
+	U2::Union{Nothing, AbstractArray{ComplexF64}}
+	e::Union{Nothing, AbstractArray{ComplexF64}}
+	r::Union{Nothing, AbstractArray{ComplexF64}}
 	it::Int
 end
 

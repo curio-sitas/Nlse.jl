@@ -11,10 +11,22 @@ function combine(sol1::Solution, sol2::Solution)
 
 end
 
+function output(sol::Solution)
+	return sol.At[end, :], sol.Af[end, :]
+end
+
+function input(sol::Solution)
+	return sol.At[1, :], sol.Af[1, :]
+end
+
 function combine(sols::Vector{Solution})
 	sol = sols[1]
 	for soli ∈ sols[2:end]
 		sol = combine(sol, soli)
 	end
 	sol
+end
+
+function chirp(x)
+	@error "Not implemented!"
 end

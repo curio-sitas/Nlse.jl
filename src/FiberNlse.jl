@@ -2,9 +2,9 @@ module FiberNlse
 
 using FFTW
 
-export Waveguide, Solution, Model, RamanModel
+export Waveguide, Solution, GNLSEProblem, RamanGNLSEProblem
 
-export simulate, raman_linagrawaal, create_model
+export gnlse, raman_linagrawaal
 
 export combine
 
@@ -19,6 +19,6 @@ include("raman.jl")
 include("nonlinearity.jl")
 include("algorithm.jl")
 include("utils.jl")
-
+include("solvers.jl")
 end
 
