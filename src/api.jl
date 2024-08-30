@@ -10,16 +10,11 @@ function GNLSEProblem(t, wg::Waveguide)
 
 	T = t[end] - t[1]
 	N = length(t)
-	dt = T / N
 
-	ν = fftshift((-N÷2:N÷2-1) ./ T)
-	ω = 2π .* ν
+	ω = 2π .* fftshift((-N÷2:N÷2-1) ./ T)
 
-	ω0 = 2pi * c / wg.λc
-
-	# default values if no raman 
+	# raman model data / no value if no raman 
 	raman_freq_response = nothing
-	# raman prob data
 	if wg.raman_model.fr != 0.0
 		raman_freq_response = conj((fftp * ifftshift(wg.raman_model.time_response(t))))
 	end
@@ -27,7 +22,8 @@ function GNLSEProblem(t, wg::Waveguide)
 	nonlinear_function = choose_nonlinear_term(wg.self_steepening, !isnothing(raman_freq_response))
 
 	dispersion_term = -0.5wg.α .+ 1im * sum([(wg.βs[i] / factorial(i)) .* ω .^ i for i in eachindex(wg.βs)])
-	GNLSEProblem(ω, dt, N, fftp, ifftp, dispersion_term, nonlinear_function, wg.raman_model.fr, wg.γ, raman_freq_response, ω0, wg.L)
+
+	GNLSEProblem(ω, T / N, N, fftp, ifftp, dispersion_term, nonlinear_function, wg.raman_model.fr, wg.γ, raman_freq_response, 2pi * c / wg.λc, wg.L)
 end
 
 
