@@ -21,7 +21,7 @@
 	P₀ = 1.0 # Soliton power
 	Ψₒ = sqrt(P₀) * cos.(t ./ τ) .+ 0.0im# Soliton formula
 
-	sol = gnlse(Ψₒ, t, fib, nsaves = 2^5, reltol = 1e-9, dz = 1e-6 * L)
+	sol = gnlse(Ψₒ, t, fib, nsaves = 2^5, reltol = 1e-9, dz = 1e-2 * L)
 
 	origin(x) = x .- x[1]
 

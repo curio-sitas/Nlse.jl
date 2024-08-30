@@ -27,29 +27,32 @@ function GNLSEProblem(t, wg::Waveguide)
 end
 
 
-
-
 function _compute_error(a, b)
-	sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
+	return sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
+end
+
+
+function _compute_error!(err, a, b)
+	err = sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
 end
 
 function _integrate_to_z(stepper, z, prob, maxiters, reltol)
 	stepper.it = 0
 	while stepper.z < z
 		_erk4ip_step!(stepper, prob)
-		stepper.local_error = _compute_error(stepper.U1, stepper.U2)
+		_compute_error!(stepper.local_error, stepper.U1, stepper.U2)
 
 		dzopt =
 			max(0.5, min(2.0, 0.9 * sqrt(sqrt(reltol / stepper.local_error)))) * stepper.dz
 
 		if stepper.local_error <= reltol
 			stepper.dz = min(dzopt, abs(z - stepper.z))
-			stepper.z = stepper.z + stepper.dz
+			stepper.z += stepper.dz
 			stepper.U = stepper.U1
 			stepper.NU = stepper.k5
 		else
 			stepper.dz = dzopt
-			stepper.it = stepper.it + 1
+			stepper.it += 1
 			if (stepper.it >= maxiters)
 				throw(ErrorException("Max number of iteration exceeded!"))
 			end
