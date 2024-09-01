@@ -1,12 +1,10 @@
 using FiberNlse
 using Documenter
 
-DocMeta.setdocmeta!(FiberNlse, :DocTestSetup, :(using FiberNlse); recursive = true)
-
 makedocs(;
+	sitename = "FiberNlse.jl",
 	modules = [FiberNlse],
 	authors = "curio-sitas <brian.sinquin@gmail.com> and contributors",
-	sitename = "FiberNlse.jl",
 	format = Documenter.HTML(;
 		canonical = "https://brian-sinquin.github.io/FiberNlse.jl",
 		edit_link = "main",
