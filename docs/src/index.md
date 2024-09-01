@@ -9,6 +9,4 @@ Documentation for [FiberNlse](https://github.com/brian-sinquin/FiberNlse.jl).
 ```@index
 ```
 
-```@autodocs
-Modules = [FiberNlse]
-```
+
