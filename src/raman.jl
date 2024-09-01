@@ -1,3 +1,9 @@
+
+"""
+Agrawaal raman model
+
+Default values are (fr = 0.18 , τl = 32e-15 [s], τvib = 12.2e-15 [s])
+"""
 function raman_linagrawaal(fr = 0.18, τl = 32e-15,
 	τvib = 12.2e-15)
 
