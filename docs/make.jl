@@ -4,6 +4,7 @@ using Documenter
 makedocs(;
 	sitename = "FiberNlse.jl",
 	modules = [FiberNlse],
+	checkdocs = :exports,
 	authors = "curio-sitas <brian.sinquin@gmail.com> and contributors",
 	format = Documenter.HTML(;
 		canonical = "https://brian-sinquin.github.io/FiberNlse.jl",
