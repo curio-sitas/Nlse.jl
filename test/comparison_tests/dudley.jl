@@ -29,7 +29,7 @@
 	nsaves = 200     # number of length steps to save field at
 
 	sol = gnlse(A, T, wg, nsaves = nsaves, dz = flength / (0.5nsaves), reltol = 1e-6)
-	fn = joinpath(dirname(@__FILE__), "data\\table_dudley_test_t.csv")
+	fn = joinpath(dirname(@__FILE__), "data/table_dudley_test_t.csv")
 	dat = CSV.read(fn, DataFrame)
 
 	t_dudley = dat.t
