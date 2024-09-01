@@ -1,41 +1,24 @@
 module FiberNlse
-using DSP: fft, ifft, ifftshift, fftshift, unwrap, rms
 
-# Physical units & constants
+using FFTW
 
-nm = ns = 1e-9
-ps = pm = 1e-12
-km = kHz = 1e3
-mW = mm = ms = 1e-3
-GHz = 1e9
-THz = 1e12
-m = W = 1
+export Waveguide, Solution, GNLSEProblem, RamanGNLSEProblem
 
-# light speed in vaccum
-c = 299792458 # m/s
+export gnlse, raman_linagrawaal
 
-export Fiber,
-    Dispersion, Field, dispersion, smf28, edfa, propagate, output, concatf, phase, instFreq, spectrum
-export ps, pm, ns, nm, mW, mm, ms, m, W, km, kHz, GHz, THz
+export combine
 
-global DefaultPhaseConvention::Symbol
-global DefaultPhaseConvention = :positive
+# Light celerity
+c = 299792458
 
-function setPhaseConvention(conv::Symbol)
-    global DefaultPhaseConvention = conv
-end
+@info "The integrated signal is supposed to follow the negative phase convention."
 
-getPhaseConvention() = DefaultPhaseConvention
-function getPhaseConventionSign(conv::Symbol)
-    conv == :positive ? +1 : -1
-end
-
-
-include("spacetime.jl")
-include("dispersion.jl")
-include("fiber.jl")
-include("simulation.jl")
-include("analysis.jl")
+include("datatypes.jl")
+include("api.jl")
+include("raman.jl")
+include("nonlinearity.jl")
+include("algorithm.jl")
 include("utils.jl")
-
+include("solvers.jl")
 end
+

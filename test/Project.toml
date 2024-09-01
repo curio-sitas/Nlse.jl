@@ -1,4 +1,5 @@
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
-ProgressBars = "49802e3a-d2f1-5c88-81d8-b72133a6f568"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

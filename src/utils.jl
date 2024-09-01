@@ -1,18 +1,43 @@
+"""
+Combines two different [Solution](@ref) structs to an unique one.
+"""
+function combine(sol1::Solution, sol2::Solution)
 
-#! TODO better derivation
-function derivate(y::AbstractVector, x::AbstractVector)
-    function centraldiff(v::AbstractVector)
-        dv = diff(v) / 2 # half the derivative
-        a = [dv[1]; dv] # copies first element
-        a .+= [dv; dv[end]] # copies last element, add both results to compute average
-        return (a)
-    end
-    return centraldiff(y) ./ centraldiff(x)
+	t = sol1.t
+	f = sol1.f
+	At = vcat(sol1.At, sol2.At)
+	Af = vcat(sol1.Af, sol2.Af)
+	z = vcat(sol1.z, sol2.z .+ sol1.z[end])
+	Solution(z, t, f, At, Af)
+
 end
 
 
-RMS(ψ) = sqrt(mean(abs2.(ψ)))
+"""
+Returns the time and frequency domain output signal of a [Solution](@ref)
+"""
+function output(sol::Solution)
+	return sol.At[end, :], sol.Af[end, :]
+end
 
-dBm2W(dBm) = 10^(0.1dBm-3)
-W2dBm(W) = 10log10(W) + 30
+"""
+Returns the time and frequency domain input signal of a [Solution](@ref)
+"""
+function input(sol::Solution)
+	return sol.At[1, :], sol.Af[1, :]
+end
 
+"""
+Combines a set of [Solution](@ref) structs to an unique one.
+"""
+function combine(sols::Vector{Solution})
+	sol = sols[1]
+	for soli ∈ sols[2:end]
+		sol = combine(sol, soli)
+	end
+	sol
+end
+
+function chirp(x)
+	@error "Not implemented!"
+end
