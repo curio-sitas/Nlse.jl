@@ -28,7 +28,7 @@
 	# === simulation parameters
 	nsaves = 200     # number of length steps to save field at
 
-	@time sol = gnlse(A, T, wg, nsaves = nsaves, dz = flength / (0.5nsaves), reltol = 1e-6)
+	sol = gnlse(A, T, wg, nsaves = nsaves, dz = flength / (0.5nsaves), reltol = 1e-6)
 	fn = joinpath(dirname(@__FILE__), "data\\table_dudley_test_t.csv")
 	dat = CSV.read(fn, DataFrame)
 
@@ -39,8 +39,8 @@
 
 	#plot(abs.(I .- It_dudley) / maximum(I) * 100)
 
-	err = 1 / length(I) * sum(abs.(I .- It_dudley) / maximum(I) * 100)
+	err = 1 / length(I) * sum(abs.(I .- It_dudley) / maximum(I))
 
-	@test err < 1.0f / 100
+	@test err < 1.0 / 100
 
 end
