@@ -14,6 +14,8 @@ makedocs(;
 	),
 	pages = [
 		"Home" => "index.md",
+		#joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(MD_OUTPUT))),
+		"API" => "api.md",
 	],
 )
 
