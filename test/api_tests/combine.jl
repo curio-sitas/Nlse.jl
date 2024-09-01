@@ -14,6 +14,7 @@
 	fib2 = Waveguide(0.0, [0.0, 3e-26], 0.0, λ, L)
 
 	t = (-N÷2:N÷2-1) * T / N
+
 	prob1 = GNLSEProblem(t, fib1)
 	prob2 = GNLSEProblem(t, fib2)
 

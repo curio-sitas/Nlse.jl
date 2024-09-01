@@ -1,5 +1,7 @@
 function _erk4ip_step!(stepper, model)
 
+	#todo! inplace rk_order + nl fct
+
 	stepper.e = exp.(0.5 * stepper.dz * model.dispersion_term)
 
 	stepper.Uip = stepper.e .* stepper.U

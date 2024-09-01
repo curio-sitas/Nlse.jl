@@ -1,4 +1,6 @@
 
+#TODO!: inplace functions
+
 function _spm(u, model)
 	return 1.0im .* model.γ * (model.fftp * (u .* abs2.(u)))
 end

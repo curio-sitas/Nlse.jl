@@ -1,8 +1,3 @@
-
-
-
-
-
 function GNLSEProblem(t, wg::Waveguide)
 
 	fftp = plan_fft(t, flags = FFTW.MEASURE)
@@ -20,7 +15,6 @@ function GNLSEProblem(t, wg::Waveguide)
 	end
 
 	nonlinear_function = choose_nonlinear_term(wg.self_steepening, !isnothing(raman_freq_response))
-
 	dispersion_term = -0.5wg.α .+ 1im * sum([(wg.βs[i] / factorial(i)) .* ω .^ i for i in eachindex(wg.βs)])
 
 	GNLSEProblem(ω, T / N, N, fftp, ifftp, dispersion_term, nonlinear_function, wg.raman_model.fr, wg.γ, raman_freq_response, 2pi * c / wg.λc, wg.L)
@@ -32,15 +26,15 @@ function _compute_error(a, b)
 end
 
 
-function _compute_error!(err, a, b)
-	err = sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
+function _compute_error!(stepper::Stepper, a, b)
+	stepper.local_error = sqrt(sum(abs2.(a .- b)) ./ sum(abs2.(a)))
 end
 
 function _integrate_to_z(stepper, z, prob, maxiters, reltol)
 	stepper.it = 0
 	while stepper.z < z
 		_erk4ip_step!(stepper, prob)
-		_compute_error!(stepper.local_error, stepper.U1, stepper.U2)
+		_compute_error!(stepper, stepper.U1, stepper.U2)
 
 		dzopt =
 			max(0.5, min(2.0, 0.9 * sqrt(sqrt(reltol / stepper.local_error)))) * stepper.dz

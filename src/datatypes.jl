@@ -20,7 +20,6 @@ Waveguide(α, βs, γ, λc, L; raman_model = NoRaman, self_steepening = false) =
 
 
 mutable struct GNLSEProblem
-	#t::AbstractArray{Float64}
 	ω::AbstractArray{Float64}
 	dt::Float64
 	N::Int
@@ -60,6 +59,7 @@ mutable struct Stepper
 	U2::Union{Nothing, AbstractArray{ComplexF64}}
 	e::Union{Nothing, AbstractArray{ComplexF64}}
 	r::Union{Nothing, AbstractArray{ComplexF64}}
+
 	it::Int
 end
 

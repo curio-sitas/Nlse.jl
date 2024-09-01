@@ -37,7 +37,7 @@ q = 1.6
 U = @. sqrt(P0) * cos(0.5pi * V0 / Vpirf * cos(Ω0 * t) + 0.5pi * Vb / Vpidc) * cis(pi * q * V0 / Vpip * cos(Ω0 * t + Δθ))
 
 
-sol = gnlse(U, t, fiber, nsaves = 10, dz = 10.0, reltol = 1e-5)
+sol = gnlse(U, t, fiber, nsaves = 256, dz = 50.0, reltol = 1e-5)
 
 
 

@@ -1,12 +1,15 @@
 using Test
-using DSP
+
 using FiberNlse
+using DSP
 
-const TEST_DIR = dirname(@__FILE__)
+using DataFrames
+using CSV
 
-for b ∈ ["api_tests", "physical_tests"]
-	@info "Testing $(b) bundle"
-	for test ∈ readdir(joinpath(dirname(@__FILE__), b), join = true)
+
+for bundle ∈ ["comparison_tests"]
+	@info "Testing $(bundle) bundle"
+	for test ∈ readdir(joinpath(dirname(@__FILE__), bundle), join = true)
 		include(test)
 	end
 end

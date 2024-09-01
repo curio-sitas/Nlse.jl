@@ -24,11 +24,11 @@ gamma = 0.11;               # nonlinear coefficient [1/W/m]
 loss = 0.0;                   # loss [dB/m]
 
 wg = Waveguide(loss, betas, gamma, wavelength, flength, raman_model = raman_linagrawaal(), self_steepening = true)
-prob = GNLSEProblem(T, wg)
+prob = GNLSEProblem(T, wg);
 # === simulation parameters
 nsaves = 200;     # number of length steps to save field at
 
-@time sol = gnlse(A, T, wg, nsaves = nsaves, dz = flength / (2 * nsaves), reltol = 1e-5);
+@time sol = gnlse(A, T, wg, nsaves = 200, dz = flength / (2 * nsaves), reltol = 1e-5);
 
 # Spectrum
 
